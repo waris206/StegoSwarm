@@ -15,7 +15,8 @@ const LiveTerminal = ({ isActive, fileId }) => {
   }, [isActive]);
 
   useEffect(() => {
-    const eventSource = new EventSource('http://localhost:5000/api/swarm-stream');
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const eventSource = new EventSource(`${apiUrl}/api/swarm-stream`);
 
     eventSource.onmessage = (event) => {
       const data = event.data.trim();
