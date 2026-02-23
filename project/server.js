@@ -17,6 +17,7 @@ const PORT = 5000;
 
 // Load environment variables
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const SERVER_URL = process.env.SERVER_URL || `http://localhost:${PORT}`;
 
 /**
  * Generate styled HTML report from Markdown content
@@ -168,7 +169,7 @@ Respond in a professional, investigative tone as if you're reporting to a team.`
       headers: {
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:5000',
+        'HTTP-Referer': SERVER_URL,
         'X-Title': 'StegoSwarm Forensics'
       },
       body: JSON.stringify({
@@ -211,7 +212,7 @@ Respond in a professional, investigative tone as if you're reporting to a team.`
           try {
             const htmlReport = generateHTMLReport(fullReport);
             fs.writeFileSync(reportPath, htmlReport, 'utf8');
-            const downloadUrl = `http://localhost:5000/uploads/${reportFilename}`;
+            const downloadUrl = `${SERVER_URL}/uploads/${reportFilename}`;
             streamResponse.write(`event: fileReady\ndata: ${JSON.stringify({ url: downloadUrl })}\n\n`);
           } catch (writeErr) {
             console.error('Report write error:', writeErr);
@@ -236,7 +237,7 @@ Respond in a professional, investigative tone as if you're reporting to a team.`
             try {
               const htmlReport = generateHTMLReport(fullReport);
               fs.writeFileSync(reportPath, htmlReport, 'utf8');
-              const downloadUrl = `http://localhost:5000/uploads/${reportFilename}`;
+              const downloadUrl = `${SERVER_URL}/uploads/${reportFilename}`;
               streamResponse.write(`event: fileReady\ndata: ${JSON.stringify({ url: downloadUrl })}\n\n`);
             } catch (writeErr) {
               console.error('Report write error:', writeErr);
