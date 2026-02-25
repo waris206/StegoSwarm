@@ -7,7 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { marked } from 'marked';
-import { calculateShannonEntropy } from './forensics.js';
+import { calculateShannonEntropy, extractMagicBytes } from './forensics.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -123,7 +123,7 @@ ${htmlContent}
 
 /**
  * Stream AI analysis from OpenRouter Free Models API
- * @param {Object} fileData - File metadata (name, size, sha256, entropy)
+ * @param {Object} fileData - File metadata (name, size, sha256, entropy, magicBytes, claimedExtension)
  * @param {Object} streamResponse - SSE response object to write to
  */
 async function streamForensicAnalysis(fileData, streamResponse) {
@@ -153,6 +153,8 @@ File Details:
 - Size: ${fileData.size} bytes
 - SHA-256 Hash: ${fileData.sha256}
 - Shannon Entropy: ${fileData.entropy} bits/byte
+- Claimed Extension: ${fileData.claimedExtension || 'N/A'}
+- Magic Bytes (first 4 bytes, hex): ${fileData.magicBytes || 'N/A'}
 
 Analyze this forensic data and provide your findings in real-time. Act as an expert investigator explaining:
 1. What the entropy score indicates about the file's randomness
@@ -160,6 +162,12 @@ Analyze this forensic data and provide your findings in real-time. Act as an exp
 3. Recommendations for further investigation
 
 Contextualize the Shannon Entropy score based on the file extension. Note that formats like .pdf, .zip, .png, and .jpg natively use heavy compression (like FlateDecode), which naturally results in high entropy (7.2 - 7.9 bits/byte). Do NOT immediately flag high entropy as malicious for these file types. Acknowledge that this is standard compression unless there are other supporting anomalies. Conversely, if an uncompressed file (.txt, .csv) has an entropy above 6.0, aggressively flag it as potentially encrypted or packed.
+
+You are also given the file's claimed extension and its extracted magic bytes (first four bytes of the file, as a hex signature). Cross-reference these aggressively:
+- Treat the magic bytes as ground truth for the actual file type.
+- Compare the magic bytes against well-known signatures (for example, PDF files typically begin with 25 50 44 46, PNG with 89 50 4E 47, ZIP with 50 4B 03 04, JPEG with FF D8 FF, etc.).
+- If the claimed extension does NOT match what the magic bytes strongly suggest, classify this as a HIGH-RISK EXTENSION SPOOFING attempt and clearly call it out.
+- If the magic bytes are missing, incomplete, or ambiguous, explicitly state that the file type cannot be confidently verified from the signature and adjust your risk assessment accordingly.
 
 Respond in a professional, investigative tone as if you're reporting to a team.`;
 
@@ -312,11 +320,23 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   const filePath = req.file.path;
   const sha256Hash = await calculateFileHash(filePath);
   const entropyScore = calculateShannonEntropy(filePath);
+  const magicBytes = extractMagicBytes(filePath);
+  const claimedExtension = (() => {
+    const parts = req.file.originalname.split('.');
+    if (parts.length < 2) return '';
+    return parts.pop().toLowerCase();
+  })();
 
   // 1. Send immediate data back to GUI
   res.json({
     success: true,
-    file: { name: req.file.originalname, size: req.file.size, sha256: sha256Hash, entropy: entropyScore }
+    file: {
+      name: req.file.originalname,
+      size: req.file.size,
+      sha256: sha256Hash,
+      entropy: entropyScore,
+      magicBytes: magicBytes
+    }
   });
 
   // 2. Stream real AI analysis from OpenRouter DeepSeek API
@@ -325,7 +345,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       name: req.file.originalname,
       size: req.file.size,
       sha256: sha256Hash,
-      entropy: entropyScore
+      entropy: entropyScore,
+      magicBytes: magicBytes,
+      claimedExtension
     };
     
     // Start streaming forensic analysis

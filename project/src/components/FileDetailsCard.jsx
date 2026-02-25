@@ -77,11 +77,24 @@ const FileDetailsCard = ({ file }) => {
               <BarChart3 className="w-4 h-4 text-slate-400" />
               <span className="text-sm font-medium text-slate-300">Shannon Entropy</span>
             </div>
-            <div className="bg-slate-950 border border-zinc-800 rounded p-3">
+            <div className="bg-slate-950 border border-zinc-800 rounded p-3 mb-3">
               <code className="text-xs text-cyber-blue font-mono">
                 {file.entropy} bits/byte
               </code>
             </div>
+            {file.magicBytes && (
+              <div>
+                <div className="flex items-center space-x-2 mb-2">
+                  <Hash className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm font-medium text-slate-300">Magic Bytes (Hex Signature)</span>
+                </div>
+                <div className="bg-slate-950 border border-zinc-800 rounded p-3">
+                  <code className="text-xs text-cyber-blue font-mono">
+                    {file.magicBytes}
+                  </code>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
