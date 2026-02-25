@@ -19,9 +19,12 @@ const LiveTerminal = ({ isActive, fileId }) => {
     const eventSource = new EventSource(`${apiUrl}/api/swarm-stream`);
 
     eventSource.onmessage = (event) => {
-      const data = event.data.trim();
+      const data = event.data;
+      if (!data) return;
       if (data === '[DONE]') return;
-      if (data) setStreamText((prev) => prev + data);
+
+      // Append each incoming token/chunk to a single active stream string
+      setStreamText((prev) => prev + data);
     };
 
     eventSource.addEventListener('fileReady', (event) => {
