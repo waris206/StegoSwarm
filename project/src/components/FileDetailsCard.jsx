@@ -1,4 +1,4 @@
-import { FileIcon, Hash, Weight, Calendar, CheckCircle, Copy, BarChart3 } from 'lucide-react';
+import { FileIcon, Hash, Weight, CheckCircle, Copy, BarChart3, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 
 const FileDetailsCard = ({ file }) => {
@@ -95,6 +95,24 @@ const FileDetailsCard = ({ file }) => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+        
+        {file.virusTotal && (
+          <div>
+            <div className="flex items-center space-x-2 mb-2">
+              <ShieldAlert className="w-4 h-4 text-slate-400" />
+              <span className="text-sm font-medium text-slate-300">Threat Intelligence (VirusTotal)</span>
+            </div>
+            <div className="bg-slate-950 border border-zinc-800 rounded p-3">
+              <code
+                className={`text-xs font-mono ${
+                  file.virusTotal.malicious > 0 ? 'text-red-400' : 'text-cyber-green'
+                }`}
+              >
+                Malicious: {file.virusTotal.malicious ?? 0} / Clean: {file.virusTotal.undetected ?? 0}
+              </code>
+            </div>
           </div>
         )}
       </div>

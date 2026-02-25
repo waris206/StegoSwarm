@@ -18,6 +18,7 @@ const PORT = 5000;
 // Load environment variables
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const SERVER_URL = process.env.SERVER_URL || `http://localhost:${PORT}`;
+const VIRUSTOTAL_API_KEY = process.env.VIRUSTOTAL_API_KEY;
 
 /**
  * Generate styled HTML report from Markdown content
@@ -155,6 +156,7 @@ File Details:
 - Shannon Entropy: ${fileData.entropy} bits/byte
 - Claimed Extension: ${fileData.claimedExtension || 'N/A'}
 - Magic Bytes (first 4 bytes, hex): ${fileData.magicBytes || 'N/A'}
+- VirusTotal Intelligence: Malicious detections: ${fileData.virusTotal?.malicious ?? 0}, Undetected/Clean: ${fileData.virusTotal?.undetected ?? 0}
 
 Analyze this forensic data and provide your findings in real-time. Act as an expert investigator explaining:
 1. What the entropy score indicates about the file's randomness
@@ -168,6 +170,11 @@ You are also given the file's claimed extension and its extracted magic bytes (f
 - Compare the magic bytes against well-known signatures (for example, PDF files typically begin with 25 50 44 46, PNG with 89 50 4E 47, ZIP with 50 4B 03 04, JPEG with FF D8 FF, etc.).
 - If the claimed extension does NOT match what the magic bytes strongly suggest, classify this as a HIGH-RISK EXTENSION SPOOFING attempt and clearly call it out.
 - If the magic bytes are missing, incomplete, or ambiguous, explicitly state that the file type cannot be confidently verified from the signature and adjust your risk assessment accordingly.
+
+You are also provided with aggregated VirusTotal threat intelligence for this hash. Treat this as a primary signal:
+- Clearly state how many antivirus engines flagged the file as malicious, and how many reported it as undetected/clean.
+- If any engines (malicious > 0) detect the file as malicious, treat this as a strong indicator of compromise and weigh it heavily in your final risk classification and recommendations.
+- If all engines report the file as clean/undetected (malicious = 0), you may downgrade—but not automatically dismiss—other weaker anomalies, and explain why.
 
 Respond in a professional, investigative tone as if you're reporting to a team.`;
 
@@ -313,6 +320,60 @@ function calculateFileHash(filePath) {
   });
 }
 
+/**
+ * Check a file hash against the VirusTotal v3 API.
+ * Returns an object with malicious and undetected counts, or a safe default.
+ * @param {string} sha256Hash
+ * @returns {Promise<{ malicious: number, undetected: number, note?: string }>}
+ */
+async function checkVirusTotal(sha256Hash) {
+  const safeDefault = {
+    malicious: 0,
+    undetected: 0,
+    note: 'File not found in VirusTotal database or lookup unavailable'
+  };
+
+  if (!VIRUSTOTAL_API_KEY) {
+    console.warn('VIRUSTOTAL_API_KEY not configured; skipping VirusTotal lookup.');
+    return safeDefault;
+  }
+
+  try {
+    const response = await fetch(`https://www.virustotal.com/api/v3/files/${sha256Hash}`, {
+      method: 'GET',
+      headers: {
+        'x-apikey': VIRUSTOTAL_API_KEY
+      }
+    });
+
+    if (response.status === 404) {
+      return {
+        malicious: 0,
+        undetected: 0,
+        note: '0 detections / File not found in VirusTotal database'
+      };
+    }
+
+    if (!response.ok) {
+      console.error('VirusTotal API error:', response.status);
+      return safeDefault;
+    }
+
+    const payload = await response.json();
+    const stats = payload?.data?.attributes?.last_analysis_stats || {};
+    const malicious = typeof stats.malicious === 'number' ? stats.malicious : 0;
+    const undetected = typeof stats.undetected === 'number' ? stats.undetected : 0;
+
+    return {
+      malicious,
+      undetected
+    };
+  } catch (error) {
+    console.error('VirusTotal lookup failed:', error);
+    return safeDefault;
+  }
+}
+
 // File upload endpoint
 app.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
@@ -321,6 +382,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   const sha256Hash = await calculateFileHash(filePath);
   const entropyScore = calculateShannonEntropy(filePath);
   const magicBytes = extractMagicBytes(filePath);
+  const vtStats = await checkVirusTotal(sha256Hash);
   const claimedExtension = (() => {
     const parts = req.file.originalname.split('.');
     if (parts.length < 2) return '';
@@ -335,7 +397,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       size: req.file.size,
       sha256: sha256Hash,
       entropy: entropyScore,
-      magicBytes: magicBytes
+      magicBytes: magicBytes,
+      virusTotal: vtStats
     }
   });
 
@@ -347,7 +410,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       sha256: sha256Hash,
       entropy: entropyScore,
       magicBytes: magicBytes,
-      claimedExtension
+      claimedExtension,
+      virusTotal: vtStats
     };
     
     // Start streaming forensic analysis

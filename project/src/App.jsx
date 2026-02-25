@@ -31,13 +31,14 @@ function App() {
       const data = await response.json();
 
       if (data.success && data.file) {
-        // Capture sha256, entropy, and magic bytes from backend response
+        // Capture sha256, entropy, magic bytes, and VirusTotal stats from backend response
         setUploadedFile({
           name: data.file.name,
           size: data.file.size,
           sha256: data.file.sha256,
           entropy: data.file.entropy,
           magicBytes: data.file.magicBytes,
+          virusTotal: data.file.virusTotal,
         });
 
         setTimeout(() => setCurrentStage('hashed'), 500);
