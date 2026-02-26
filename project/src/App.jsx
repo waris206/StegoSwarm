@@ -31,7 +31,7 @@ function App() {
       const data = await response.json();
 
       if (data.success && data.file) {
-        // Capture sha256, entropy, magic bytes, and VirusTotal stats from backend response
+        // Capture sha256, entropy, magic bytes, VirusTotal, strings, and metadata from backend response
         setUploadedFile({
           name: data.file.name,
           size: data.file.size,
@@ -39,6 +39,8 @@ function App() {
           entropy: data.file.entropy,
           magicBytes: data.file.magicBytes,
           virusTotal: data.file.virusTotal,
+          extractedStrings: data.file.extractedStrings,
+          fileMetadata: data.file.fileMetadata,
         });
 
         setTimeout(() => setCurrentStage('hashed'), 500);

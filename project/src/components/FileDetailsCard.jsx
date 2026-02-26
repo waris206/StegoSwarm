@@ -115,6 +115,41 @@ const FileDetailsCard = ({ file }) => {
             </div>
           </div>
         )}
+
+        <div>
+          <div className="flex items-center space-x-2 mb-2">
+            <span className="text-sm font-medium text-slate-300">EXIF / Metadata</span>
+          </div>
+          <div className="bg-slate-950 border border-zinc-800 rounded p-3 max-h-32 overflow-y-auto text-xs text-slate-300">
+            {file.fileMetadata && file.fileMetadata.tags && Object.keys(file.fileMetadata.tags).length > 0 ? (
+              <ul className="space-y-1">
+                {Object.entries(file.fileMetadata.tags).map(([key, value]) => (
+                  <li key={key}>
+                    <span className="font-semibold text-slate-200">{key}:</span>{' '}
+                    <span className="text-slate-400">{String(value)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-slate-500">No metadata found</span>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center space-x-2 mb-2">
+            <span className="text-sm font-medium text-slate-300">Extracted Strings (Preview)</span>
+          </div>
+          <div className="bg-slate-950 border border-zinc-800 rounded p-3 max-h-40 overflow-y-auto">
+            {Array.isArray(file.extractedStrings) && file.extractedStrings.length > 0 ? (
+              <pre className="text-xs text-cyber-blue font-mono whitespace-pre-wrap break-words m-0">
+                {file.extractedStrings.join('\n')}
+              </pre>
+            ) : (
+              <span className="text-xs text-slate-500">No printable ASCII strings (6+ chars) extracted.</span>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex items-center justify-between text-xs">

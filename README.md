@@ -9,13 +9,15 @@ StegoSwarm is a full-stack, real-time digital forensics platform designed to aut
 * **Threat Intelligence Integration:** Automatically queries the VirusTotal v3 API to cross-reference the file's SHA-256 hash against 70+ global antivirus engines.
 * **AI Agent Swarm Analysis:** Streams a real-time, context-aware forensic report to the UI using Server-Sent Events (SSE). The AI (powered by DeepSeek via OpenRouter) synthesizes the entropy, magic bytes, and VT scores to provide a court-ready security assessment.
 * **Exportable HTML Reports:** Generates polished, downloadable forensic reports directly from the AI's markdown output.
+* **ASCII String Extraction (Malware Triage):** Extracts and surfaces long printable ASCII strings from the file to quickly reveal hardcoded IPs, URLs, PE artifacts, or tool marks that indicate malware staging or data exfiltration.
+* **EXIF/Metadata Stripping (Image Forensics):** Parses and summarizes EXIF and filesystem metadata (timestamps, authors, GPS coordinates) to detect spoofed provenance, tampered images, or privacy-sensitive location leaks.
 
 ##  Tech Stack
 * **Frontend:** React, Vite, Tailwind CSS
 * **Backend:** Node.js, Express.js
 * **Architecture:** Server-Sent Events (SSE) for real-time AI UI streaming.
 
-## ⚙️ Local Setup
+## ⚙️ Local Setup (v1.0 Complete — v2 Coming Soon)
 1. Clone the repository:
    ```bash
    git clone [https://github.com/waris206/StegoSwarm.git](https://github.com/waris206/StegoSwarm.git)

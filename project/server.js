@@ -7,7 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { marked } from 'marked';
-import { calculateShannonEntropy, extractMagicBytes } from './forensics.js';
+import { calculateShannonEntropy, extractMagicBytes, extractStrings, extractMetadata } from './forensics.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -124,7 +124,7 @@ ${htmlContent}
 
 /**
  * Stream AI analysis from OpenRouter Free Models API
- * @param {Object} fileData - File metadata (name, size, sha256, entropy, magicBytes, claimedExtension)
+ * @param {Object} fileData - File metadata (name, size, sha256, entropy, magicBytes, claimedExtension, strings, metadata)
  * @param {Object} streamResponse - SSE response object to write to
  */
 async function streamForensicAnalysis(fileData, streamResponse) {
@@ -157,6 +157,16 @@ File Details:
 - Claimed Extension: ${fileData.claimedExtension || 'N/A'}
 - Magic Bytes (first 4 bytes, hex): ${fileData.magicBytes || 'N/A'}
 - VirusTotal Intelligence: Malicious detections: ${fileData.virusTotal?.malicious ?? 0}, Undetected/Clean: ${fileData.virusTotal?.undetected ?? 0}
+-
+- Extracted ASCII Strings (sample): ${Array.isArray(fileData.strings) && fileData.strings.length > 0 ? fileData.strings.slice(0, 10).join(' | ') : 'None extracted or not available'}
+- File Metadata Snapshot: ${
+  fileData.metadata && fileData.metadata.tags && Object.keys(fileData.metadata.tags).length > 0
+    ? Object.entries(fileData.metadata.tags)
+        .slice(0, 5)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(' | ')
+    : 'No EXIF/metadata tags discovered'
+}
 
 Analyze this forensic data and provide your findings in real-time. Act as an expert investigator explaining:
 1. What the entropy score indicates about the file's randomness
@@ -175,6 +185,16 @@ You are also provided with aggregated VirusTotal threat intelligence for this ha
 - Clearly state how many antivirus engines flagged the file as malicious, and how many reported it as undetected/clean.
 - If any engines (malicious > 0) detect the file as malicious, treat this as a strong indicator of compromise and weigh it heavily in your final risk classification and recommendations.
 - If all engines report the file as clean/undetected (malicious = 0), you may downgrade—but not automatically dismiss—other weaker anomalies, and explain why.
+
+In addition, you are given:
+- Extracted printable ASCII strings of length 6+ from the file, and
+- A summarized view of the file's EXIF/metadata (when available).
+
+Use these aggressively for static analysis:
+- Examine strings for hardcoded IP addresses, domains/URLs, file paths, user names, registry keys, or PE artifacts (e.g., the classic \"This program cannot be run in DOS mode\" marker, import table names, or suspicious DLLs).
+- Correlate any suspicious strings with the file type and entropy; for example, PE-style strings inside a document or image are highly anomalous.
+- Inspect metadata for spoofed or inconsistent authors, tools, or timestamps (e.g., creation dates far in the future/past, authors that do not match the organization, or camera/software tags that don't align with the claimed file workflow).
+- If strings or metadata strongly indicate malicious tooling, staging paths, or exfil domains, clearly elevate the risk classification and call out the indicators of compromise.
 
 Respond in a professional, investigative tone as if you're reporting to a team.`;
 
@@ -380,8 +400,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
   const filePath = req.file.path;
   const sha256Hash = await calculateFileHash(filePath);
+  const fileBuffer = fs.readFileSync(filePath);
   const entropyScore = calculateShannonEntropy(filePath);
   const magicBytes = extractMagicBytes(filePath);
+  const extractedStrings = extractStrings(fileBuffer);
+  const fileMetadata = await extractMetadata(filePath);
   const vtStats = await checkVirusTotal(sha256Hash);
   const claimedExtension = (() => {
     const parts = req.file.originalname.split('.');
@@ -398,7 +421,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       sha256: sha256Hash,
       entropy: entropyScore,
       magicBytes: magicBytes,
-      virusTotal: vtStats
+      virusTotal: vtStats,
+      extractedStrings,
+      fileMetadata
     }
   });
 
@@ -411,7 +436,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       entropy: entropyScore,
       magicBytes: magicBytes,
       claimedExtension,
-      virusTotal: vtStats
+      virusTotal: vtStats,
+      strings: extractedStrings,
+      metadata: fileMetadata
     };
     
     // Start streaming forensic analysis
