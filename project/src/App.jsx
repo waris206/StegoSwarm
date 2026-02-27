@@ -9,6 +9,7 @@ function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStage, setCurrentStage] = useState(null);
+  const [analysisMode, setAnalysisMode] = useState('v2');
 
   const handleFileUpload = async (file) => {
     setIsAnalyzing(true);
@@ -16,6 +17,7 @@ function App() {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('mode', analysisMode);
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -41,6 +43,10 @@ function App() {
           virusTotal: data.file.virusTotal,
           extractedStrings: data.file.extractedStrings,
           fileMetadata: data.file.fileMetadata,
+          peAnalysis: data.file.peAnalysis,
+          yaraHits: data.file.yaraHits,
+          digitalSignature: data.file.digitalSignature,
+          riskScore: data.file.riskScore,
         });
 
         setTimeout(() => setCurrentStage('hashed'), 500);
@@ -75,7 +81,11 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2 space-y-6">
             {!uploadedFile ? (
-              <FileUploadZone onFileUpload={handleFileUpload} />
+              <FileUploadZone
+                onFileUpload={handleFileUpload}
+                analysisMode={analysisMode}
+                onModeChange={setAnalysisMode}
+              />
             ) : (
               <div className="space-y-4">
                 <FileDetailsCard file={uploadedFile} />
@@ -93,6 +103,7 @@ function App() {
             <LiveTerminal
               isActive={isAnalyzing}
               fileId={uploadedFile?.sha256}
+              analysisMode={analysisMode}
             />
           </div>
         </div>
@@ -103,12 +114,12 @@ function App() {
       <footer className="border-t border-zinc-800 bg-slate-900 px-6 py-4">
         <div className="container mx-auto flex items-center justify-between text-xs text-slate-500">
           <div>
-            StegoSwarm v1.0.0 - Digital Forensics Platform
+            StegoSwarm v2.0.0 - Digital Forensics Platform
           </div>
           <div className="flex items-center space-x-4">
-            <span>5 AI Agents Active</span>
+            <span>{analysisMode === 'v2' ? '3 Swarm Agents' : 'Quick Triage'}</span>
             <span>•</span>
-            <span>Quantum-Grade Analysis</span>
+            <span>Deep Swarm Inspection</span>
           </div>
         </div>
       </footer>

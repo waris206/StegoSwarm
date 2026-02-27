@@ -25,7 +25,7 @@ const Navbar = () => {
             <span className="text-xs text-slate-400">Swarm Active</span>
           </div>
           <div className="text-xs text-slate-500">
-            v1.0.0
+            v2.0.0
           </div>
         </div>
       </div>
