@@ -160,17 +160,6 @@ project/
 
 ---
 
-## Recommended GitHub Topics
-
-Copy-paste these into your repository's **Topics** field on GitHub:
-
-```
-digital-forensics malware-analysis yara threat-intelligence ai-agents multi-agent-system
-react nodejs express virustotal pe-analysis authenticode entropy-analysis
-steganography cybersecurity incident-response soc-tools
-```
-
----
 
 ## Project Structure
 
