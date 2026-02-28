@@ -2,7 +2,9 @@
 
 **AI-Driven Malware Triage & Deep Swarm Inspection**
 
-![ThreatLens Demo](./assets/demo.gif)
+![ThreatLens Demo](assets/demo.gif)
+
+If the image preview does not load on your device, open it directly: [View Demo GIF](assets/demo.gif)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-brightgreen)](https://your-deployment-url.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -96,11 +98,11 @@ ThreatLens is a full-stack, real-time malware triage platform that automates fil
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/waris206/StegoSwarm.git
-cd StegoSwarm/project
+git clone https://github.com/waris206/ThreatLens.git
+cd ThreatLens/project
 ```
 
-> **Note:** The GitHub repository is named `StegoSwarm` (the original project codename). The application itself has been rebranded to **ThreatLens**.
+
 
 ### 2. Install Dependencies
 
@@ -160,8 +162,7 @@ project/
 
 ---
 
-
-## Project Structure
+##  Risk Scoring Logic
 
 | Signal | Delta | Condition |
 |---|---|---|
