@@ -1,4 +1,4 @@
-# ThreatLens v2.0 🛡️
+# ThreatLens v2.0 
 
 **AI-Driven Malware Triage & Deep Swarm Inspection**
 
@@ -15,15 +15,15 @@ ThreatLens is a full-stack, real-time malware triage platform that automates fil
 
 | Feature | Description |
 |---|---|
-| 🧮 **Hard Risk Scorer** | Deterministic, pre-AI numeric scoring engine (`riskScorer.js`). Computes a 0–100 score based on extension mismatch, entropy, digital signature trust, VirusTotal detections, YARA hits, and IAT classification — before any AI runs. Bands: `<20 LOW`, `20–60 SUSPICIOUS`, `>60 HIGH`. |
-| 🤖 **3-Agent Swarm (Deep Swarm Inspection)** | Agent 1 (Static Analyst) → Agent 2 (Threat OSINT) → Agent 3 (Lead Investigator). Each agent is grounded by the Hard Risk Score and cannot override or escalate it. |
-| 🏗️ **PE Binary Parser** | Pure-JS portable executable parser (`peParser.js`) — extracts architecture (x86/x64), sections, entry point, and full Import Address Table (IAT). Zero native dependencies. |
-| 🔬 **YARA-Lite Engine** | Regex and byte-pattern matching engine (`yaraEngine.js`) with 5 rule families: Crypto Wallet, Ransomware, C2/Network, Suspicious PE Imports, and Obfuscation. Includes `validate` callbacks for false-positive prevention (e.g., PDF checksums vs real BTC addresses). |
-| 🔏 **Authenticode Verifier** | Manual ASN.1 PKCS#7 walker using `node-forge` — extracts publisher, issuer, validity dates, and trust status. Trusted vendor signatures act as a Trust Anchor that reduces risk. |
-| 🛡️ **Risk Score UI Card** | Frontend displays a prominent risk badge with numeric score, color-coded classification (green/yellow/red), and full signal-by-signal breakdown with +/− deltas. |
-| ⚡ **429 Retry with Backoff** | Agent API calls automatically retry up to 3 times on HTTP 429 (rate limit) with exponential backoff and `Retry-After` header support. |
-| 🔒 **Security Hardened** | `helmet` security headers, `express-rate-limit` (30 req/15min), CORS restricted to dev origins, 10 MB upload limit (demo-safe), filename sanitization, auto-cleanup of uploaded files. |
-| 🚫 **False-Positive Prevention** | BTC regex requires non-hex Base58 chars (rejects MD5/SHA hashes). PE imports rule requires the full injection triad (VirtualAllocEx + WriteProcessMemory + CreateRemoteThread). AI prompts are score-grounded and explicitly told not to flag benign APIs. |
+|  **Hard Risk Scorer** | Deterministic, pre-AI numeric scoring engine (`riskScorer.js`). Computes a 0–100 score based on extension mismatch, entropy, digital signature trust, VirusTotal detections, YARA hits, and IAT classification — before any AI runs. Bands: `<20 LOW`, `20–60 SUSPICIOUS`, `>60 HIGH`. |
+|  **3-Agent Swarm (Deep Swarm Inspection)** | Agent 1 (Static Analyst) → Agent 2 (Threat OSINT) → Agent 3 (Lead Investigator). Each agent is grounded by the Hard Risk Score and cannot override or escalate it. |
+|  **PE Binary Parser** | Pure-JS portable executable parser (`peParser.js`) — extracts architecture (x86/x64), sections, entry point, and full Import Address Table (IAT). Zero native dependencies. |
+|  **YARA-Lite Engine** | Regex and byte-pattern matching engine (`yaraEngine.js`) with 5 rule families: Crypto Wallet, Ransomware, C2/Network, Suspicious PE Imports, and Obfuscation. Includes `validate` callbacks for false-positive prevention (e.g., PDF checksums vs real BTC addresses). |
+|  **Authenticode Verifier** | Manual ASN.1 PKCS#7 walker using `node-forge` — extracts publisher, issuer, validity dates, and trust status. Trusted vendor signatures act as a Trust Anchor that reduces risk. |
+|  **Risk Score UI Card** | Frontend displays a prominent risk badge with numeric score, color-coded classification (green/yellow/red), and full signal-by-signal breakdown with +/− deltas. |
+|  **429 Retry with Backoff** | Agent API calls automatically retry up to 3 times on HTTP 429 (rate limit) with exponential backoff and `Retry-After` header support. |
+|  **Security Hardened** | `helmet` security headers, `express-rate-limit` (30 req/15min), CORS restricted to dev origins, 10 MB upload limit (demo-safe), filename sanitization, auto-cleanup of uploaded files. |
+|  **False-Positive Prevention** | BTC regex requires non-hex Base58 chars (rejects MD5/SHA hashes). PE imports rule requires the full injection triad (VirtualAllocEx + WriteProcessMemory + CreateRemoteThread). AI prompts are score-grounded and explicitly told not to flag benign APIs. |
 
 ---
 
@@ -57,7 +57,7 @@ ThreatLens is a full-stack, real-time malware triage platform that automates fil
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  ThreatLens React Dashboard              │
+│                  ThreatLens React Dashboard             │
 │  FileUploadZone → FileDetailsCard (Risk Score + IAT)    │
 │  LiveTerminal (SSE stream) → InvestigationTimeline      │
 └────────────────────────┬────────────────────────────────┘
@@ -70,9 +70,9 @@ ThreatLens is a full-stack, real-time malware triage platform that automates fil
 │  3. Authenticode Digital Signature (node-forge ASN.1)   │
 │  4. VirusTotal v3 lookup                                │
 │  5. YARA-Lite scan (5 rules, validate callbacks)        │
-│  6. ═══ Hard Risk Scorer (deterministic, pre-AI) ═══   │
+│  6. ═══ Hard Risk Scorer (deterministic, pre-AI) ═══    │
 │  7. JSON response → frontend renders Risk Score card    │
-│  8. SSE stream → Agent 1 → Agent 2 → Agent 3 (AI)     │
+│  8. SSE stream → Agent 1 → Agent 2 → Agent 3 (AI)       │
 │  9. HTML report generation + download link              │
 └─────────────────────────────────────────────────────────┘
 ```
