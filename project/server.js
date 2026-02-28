@@ -200,7 +200,7 @@ Respond in a professional, investigative tone.`;
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': SERVER_URL,
-        'X-Title': 'StegoSwarm Forensics'
+        'X-Title': 'ThreatLens Forensics'
       },
       body: JSON.stringify({
         model: 'openrouter/free',
@@ -330,7 +330,7 @@ async function runAgentStream(agentId, agentName, systemPrompt, userMessage, sse
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': SERVER_URL,
-          'X-Title': 'StegoSwarm Forensics v2'
+          'X-Title': 'ThreatLens Forensics v2'
         },
         body: JSON.stringify({
           model: 'openrouter/free',
@@ -566,7 +566,7 @@ Format professionally with clear sections. This is the official forensic report.
   );
 
   // ── Save the combined report as HTML ───────────────────────────────────
-  const fullReport = `# StegoSwarm v2 — Deep Swarm Inspection Report\n\n## Agent 1: Static Analyst\n${agent1Output}\n\n---\n\n## Agent 2: Threat Intelligence & OSINT\n${agent2Output}\n\n---\n\n## Agent 3: Lead Investigator — Final Assessment\n${agent3Output}`;
+  const fullReport = `# ThreatLens v2 — Deep Swarm Inspection Report\n\n## Agent 1: Static Analyst\n${agent1Output}\n\n---\n\n## Agent 2: Threat Intelligence & OSINT\n${agent2Output}\n\n---\n\n## Agent 3: Lead Investigator — Final Assessment\n${agent3Output}`;
 
   const uploadsDir = join(__dirname, 'uploads');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -601,7 +601,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 100 * 1024 * 1024, // 100 MB max
+    fileSize: 10 * 1024 * 1024, // 10 MB max (demo-safe for public deployment)
     files: 1
   }
 });
@@ -818,4 +818,4 @@ app.post('/upload', uploadLimiter, upload.single('file'), async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`StegoSwarm API Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`ThreatLens API Server running on http://localhost:${PORT}`));

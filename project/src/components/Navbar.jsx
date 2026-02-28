@@ -11,10 +11,10 @@ const Navbar = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-cyber-green cyber-glow tracking-wider">
-              StegoSwarm
+              ThreatLens
             </h1>
             <p className="text-xs text-slate-400 tracking-wide">
-              Digital Forensics & Steganalysis Platform
+              AI-Driven Malware Triage & Deep Swarm Inspection
             </p>
           </div>
         </div>

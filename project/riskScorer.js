@@ -1,5 +1,5 @@
 /**
- * StegoSwarm v2 — Hard Risk Scorer
+ * ThreatLens v2 — Hard Risk Scorer
  *
  * Deterministic, pre-AI numeric risk scoring.
  * Runs BEFORE any LLM call so that AI agents receive a BINDING

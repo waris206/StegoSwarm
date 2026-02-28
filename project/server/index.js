@@ -115,5 +115,5 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`StegoSwarm API Server running on http://localhost:${PORT}`);
+  console.log(`ThreatLens API Server running on http://localhost:${PORT}`);
 });

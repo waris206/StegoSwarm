@@ -1,24 +1,29 @@
-# StegoSwarm v2.0
+# ThreatLens v2.0 🛡️
 
-**AI-Driven Digital Forensics & Steganalysis Platform**
+**AI-Driven Malware Triage & Deep Swarm Inspection**
 
-StegoSwarm is a full-stack, real-time digital forensics platform that automates file triage by combining deterministic risk scoring, a multi-agent AI swarm, YARA-Lite signature scanning, PE binary analysis, Authenticode signature verification, and global threat intelligence — all streamed live to a React dashboard.
+![ThreatLens Demo](./assets/demo.gif)
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Available-brightgreen)](https://your-deployment-url.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+ThreatLens is a full-stack, real-time malware triage platform that automates file analysis by combining **deterministic risk scoring**, a **multi-agent AI swarm**, **YARA-Lite signature scanning**, **PE binary analysis**, **Authenticode signature verification**, and **global threat intelligence** — all streamed live to a React dashboard.
 
 ---
 
-## What's New in v2
+## What's New in v2.0
 
 | Feature | Description |
 |---|---|
-| **Hard Risk Scorer** | Deterministic, pre-AI numeric scoring engine (`riskScorer.js`). Computes a 0–100 score based on extension mismatch, entropy, digital signature trust, VirusTotal detections, YARA hits, and IAT classification — before any AI runs. Bands: `<20 LOW`, `20–60 SUSPICIOUS`, `>60 HIGH`. |
-| **3-Agent Swarm (Deep Swarm Inspection)** | Agent 1 (Static Analyst) → Agent 2 (Threat OSINT) → Agent 3 (Lead Investigator). Each agent is grounded by the Hard Risk Score and cannot override or escalate it. |
-| **PE Binary Parser** | Pure-JS portable executable parser (`peParser.js`) — extracts architecture (x86/x64), sections, entry point, and full Import Address Table (IAT). Zero native dependencies. |
-| **YARA-Lite Engine** | Regex and byte-pattern matching engine (`yaraEngine.js`) with 5 rule families: Crypto Wallet, Ransomware, C2/Network, Suspicious PE Imports, and Obfuscation. Includes `validate` callbacks for false-positive prevention (e.g., PDF checksums vs real BTC addresses). |
-| **Authenticode Signature Verification** | Manual ASN.1 PKCS#7 walker using `node-forge` — extracts publisher, issuer, validity dates, and trust status. Trusted vendor signatures act as a Trust Anchor that reduces risk. |
-| **Risk Score UI Card** | Frontend displays a prominent risk badge with numeric score, color-coded classification (green/yellow/red), and full signal-by-signal breakdown with +/− deltas. |
-| **429 Retry with Backoff** | Agent API calls automatically retry up to 3 times on HTTP 429 (rate limit) with exponential backoff and `Retry-After` header support. |
-| **Security Hardening** | `helmet` security headers, `express-rate-limit` (30 req/15min), CORS restricted to dev origins, 100 MB upload limit, filename sanitization, auto-cleanup of uploaded files, static file access guard (reports only). |
-| **False-Positive Prevention** | BTC regex requires non-hex Base58 chars (rejects MD5/SHA hashes). PE imports rule requires the full injection triad (VirtualAllocEx + WriteProcessMemory + CreateRemoteThread). AI prompts are score-grounded and explicitly told not to flag benign APIs. |
+| 🧮 **Hard Risk Scorer** | Deterministic, pre-AI numeric scoring engine (`riskScorer.js`). Computes a 0–100 score based on extension mismatch, entropy, digital signature trust, VirusTotal detections, YARA hits, and IAT classification — before any AI runs. Bands: `<20 LOW`, `20–60 SUSPICIOUS`, `>60 HIGH`. |
+| 🤖 **3-Agent Swarm (Deep Swarm Inspection)** | Agent 1 (Static Analyst) → Agent 2 (Threat OSINT) → Agent 3 (Lead Investigator). Each agent is grounded by the Hard Risk Score and cannot override or escalate it. |
+| 🏗️ **PE Binary Parser** | Pure-JS portable executable parser (`peParser.js`) — extracts architecture (x86/x64), sections, entry point, and full Import Address Table (IAT). Zero native dependencies. |
+| 🔬 **YARA-Lite Engine** | Regex and byte-pattern matching engine (`yaraEngine.js`) with 5 rule families: Crypto Wallet, Ransomware, C2/Network, Suspicious PE Imports, and Obfuscation. Includes `validate` callbacks for false-positive prevention (e.g., PDF checksums vs real BTC addresses). |
+| 🔏 **Authenticode Verifier** | Manual ASN.1 PKCS#7 walker using `node-forge` — extracts publisher, issuer, validity dates, and trust status. Trusted vendor signatures act as a Trust Anchor that reduces risk. |
+| 🛡️ **Risk Score UI Card** | Frontend displays a prominent risk badge with numeric score, color-coded classification (green/yellow/red), and full signal-by-signal breakdown with +/− deltas. |
+| ⚡ **429 Retry with Backoff** | Agent API calls automatically retry up to 3 times on HTTP 429 (rate limit) with exponential backoff and `Retry-After` header support. |
+| 🔒 **Security Hardened** | `helmet` security headers, `express-rate-limit` (30 req/15min), CORS restricted to dev origins, 10 MB upload limit (demo-safe), filename sanitization, auto-cleanup of uploaded files. |
+| 🚫 **False-Positive Prevention** | BTC regex requires non-hex Base58 chars (rejects MD5/SHA hashes). PE imports rule requires the full injection triad (VirtualAllocEx + WriteProcessMemory + CreateRemoteThread). AI prompts are score-grounded and explicitly told not to flag benign APIs. |
 
 ---
 
@@ -52,13 +57,13 @@ StegoSwarm is a full-stack, real-time digital forensics platform that automates 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    React + Vite Frontend                │
+│                  ThreatLens React Dashboard              │
 │  FileUploadZone → FileDetailsCard (Risk Score + IAT)    │
 │  LiveTerminal (SSE stream) → InvestigationTimeline      │
 └────────────────────────┬────────────────────────────────┘
                          │ POST /upload + GET /stream
 ┌────────────────────────▼────────────────────────────────┐
-│                   Express Backend (port 5000)           │
+│               ThreatLens Express Backend (port 5000)    │
 │                                                         │
 │  1. SHA-256 + Entropy + Magic Bytes + Strings + EXIF    │
 │  2. PE Parser → IAT extraction                          │
@@ -95,6 +100,8 @@ git clone https://github.com/waris206/StegoSwarm.git
 cd StegoSwarm/project
 ```
 
+> **Note:** The GitHub repository is named `StegoSwarm` (the original project codename). The application itself has been rebranded to **ThreatLens**.
+
 ### 2. Install Dependencies
 
 ```bash
@@ -130,7 +137,42 @@ Frontend runs on `http://localhost:5173`
 
 ---
 
-## Risk Scoring Logic
+## Project Structure
+
+```
+project/
+├── server.js            # Express backend — upload, forensics pipeline, AI orchestration
+├── forensics.js         # SHA-256, entropy, magic bytes, EXIF, Authenticode, VirusTotal
+├── riskScorer.js        # Deterministic Hard Risk Scorer (pre-AI)
+├── yaraEngine.js        # YARA-Lite signature scanning engine (5 rules)
+├── peParser.js          # Pure-JS PE binary parser (IAT extraction)
+├── vite.config.js       # Vite config (uploads/ ignored by watcher)
+├── src/
+│   ├── App.jsx          # Main app — upload flow, state management
+│   └── components/
+│       ├── Navbar.jsx           # Top nav with ThreatLens branding
+│       ├── FileUploadZone.jsx   # Drag-and-drop upload with mode selector
+│       ├── FileDetailsCard.jsx  # Risk score, YARA alerts, PE/IAT, signatures
+│       ├── LiveTerminal.jsx     # Real-time SSE agent output
+│       └── InvestigationTimeline.jsx  # Progress stages
+└── uploads/             # Generated HTML reports (auto-cleaned)
+```
+
+---
+
+## Recommended GitHub Topics
+
+Copy-paste these into your repository's **Topics** field on GitHub:
+
+```
+digital-forensics malware-analysis yara threat-intelligence ai-agents multi-agent-system
+react nodejs express virustotal pe-analysis authenticode entropy-analysis
+steganography cybersecurity incident-response soc-tools
+```
+
+---
+
+## Project Structure
 
 | Signal | Delta | Condition |
 |---|---|---|

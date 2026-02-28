@@ -114,7 +114,7 @@ function App() {
       <footer className="border-t border-zinc-800 bg-slate-900 px-6 py-4">
         <div className="container mx-auto flex items-center justify-between text-xs text-slate-500">
           <div>
-            StegoSwarm v2.0.0 - Digital Forensics Platform
+            ThreatLens v2.0.0 — AI-Driven Malware Triage
           </div>
           <div className="flex items-center space-x-4">
             <span>{analysisMode === 'v2' ? '3 Swarm Agents' : 'Quick Triage'}</span>
